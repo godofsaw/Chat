@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">DAS</string>
+    <string name="choose_contacts">Choose contacts</string>
+    <string name="log_out">Log out</string>
+    <string name="settings">Settings</string>
+    <string name="search">Search</string>
+    <string name="login">Log In</string>
+    <string name="register">Create Account</string>
+
+</resources>

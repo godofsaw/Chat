@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="rtl">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:id="@+id/date_view"
+            android:layout_width="match_parent"
+            android:layout_height="17dp"
+            android:layout_marginTop="2dp"
+            android:textColor="@android:color/darker_gray"
+            android:background="@android:color/transparent"
+            android:textSize="14sp"
+            android:textAlignment="center"
+            />
+
+        <TextView
+            android:id="@+id/view_record"
+            android:layout_width="290dp"
+            android:layout_height="45dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/list_of_messages"
+            android:layout_marginBottom="-2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/bubble_txt_shape"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:paddingTop="4dp"
+            android:paddingRight="10dp"
+            android:paddingLeft="4dp"
+            android:paddingBottom="2dp"
+            android:maxLines="3"
+            />
+
+        <ListView
+            android:id="@+id/list_of_messages"
+            android:layout_width="match_parent"
+            android:layout_height="410dp"
+            android:layout_marginTop="22dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="-2dp"
+            android:stackFromBottom="true"
+            android:transcriptMode="alwaysScroll" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton1"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginRight="5dp"
+            android:layout_alignTop="@+id/view_record"
+            android:background="@drawable/mic_style"
+            android:drawableBottom="@drawable/select_mic_btn"
+            android:padding="10dp"
+            android:layout_marginTop="5dp"
+            android:textOff=""
+            android:textOn=""
+            />
+
+    </RelativeLayout>
+
+</RelativeLayout>

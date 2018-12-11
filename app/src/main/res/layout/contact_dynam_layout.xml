@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:textDirection="ltr">
+
+    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/contact_image"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layoutDirection="ltr"
+        android:src="@drawable/blank_user_image" />
+
+    <ImageView
+        android:id="@+id/delete_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="15dp"
+        android:layoutDirection="ltr"
+        android:src="@drawable/ic_cancel_black_24dp" />
+    <TextView
+        android:id="@+id/contact_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/contact_image"
+        android:text="ayelet avraham"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="20sp"
+        android:layout_marginRight="2dp"
+        android:layout_marginLeft="2dp"
+        />
+
+    <TextView
+        android:id="@+id/contact_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/contact_name"
+        android:layout_toEndOf="@+id/contact_image"
+        android:text="ayeletavraham50@gmail.com"
+        android:layout_marginRight="2dp"
+        android:layout_marginLeft="2dp"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ContactsListActivity"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <EditText
+        android:id="@+id/search_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:textDirection="rtl"
+        android:hint="@string/search"
+        android:drawableRight="@drawable/ic_search"
+        />
+
+    <ListView
+        android:id="@+id/listViewdynam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/search_text"
+        android:layout_marginTop="1dp"
+        android:dividerHeight="1dp" />
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="407dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/listViewdynam"
+        android:layout_marginTop="14dp"
+        android:dividerHeight="1dp"
+        android:transcriptMode="alwaysScroll" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/crate_group_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="28dp"
+        android:src="@drawable/ic_arrow_back_black_24dp" />
+
+</RelativeLayout>

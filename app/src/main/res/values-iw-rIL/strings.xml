@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DAS</string>
+    <string name="choose_contacts">בחר איש קשר</string>
+    <string name="log_out">התנתק</string>
+    <string name="settings">הגדרות</string>
+    <string name="search">חיפוש</string>
+    <string name="login">התחבר</string>
+    <string name="register">צור חשבון חדש</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#d8264d</color>
+    <color name="colorPrimaryDark">#b22242</color>
+    <color name="colorAccent">#d8264d</color>
+    <color name="not_my_user">#f38d56</color>
+    <color name="my_user">#3965d6</color>
+    <color name="create_account_btn">#9c9c9c</color>
+
+</resources>
