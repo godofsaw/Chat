@@ -11,7 +11,7 @@ public class ChatMessage {
     private String messageText;
     private String messageUser;
     private long messageTime;
-    private String ayelet;
+    private String vadim;
 
     public ChatMessage(String messageText, String messageUser) {
         this.messageText = messageText;
