@@ -58,7 +58,7 @@ public class ChatsGroupsActivity extends AppCompatActivity {
         user = auth.getCurrentUser();
         user_name=user.getDisplayName();
         database = FirebaseDatabase.getInstance();
-        contactChatsRef = database.getReference().child("ContactChats").child(""+user_name);
+        contactChatsRef = database.getReference().child("ContactChats").child(""+user.getUid());
 
         Gif.setVisibility(View.VISIBLE);
         Handler handler = new Handler();

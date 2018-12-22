@@ -57,14 +57,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class ContactsListActivity extends AppCompatActivity {
 
     private FirebaseListAdapter<ContactDetails> adapter;
-    private DatabaseReference dbRef;
-    private DatabaseReference contactRef,groupContactsRef;
-    private DatabaseReference groupRef;
+    private DatabaseReference contactRef,groupContactsRef,contactChatsRef,groupRef,dbRef;
     private FirebaseDatabase database;
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseUser user;
@@ -207,32 +206,57 @@ public class ContactsListActivity extends AppCompatActivity {
                                 groupCount = (int)dataSnapshot.getChildrenCount();
                                 groupCount++;
 
-                                String groupNameStr = groupName.getText().toString();
+                                final String groupNameStr = groupName.getText().toString();
                                 Map<String,Object> map = new HashMap<String, Object>();
                                 map.put(""+groupCount,groupNameStr);
                                 groupRef.updateChildren(map);
 
-                                for(int j =0;j<recyclerView.getChildCount();j++){
-                                    View view = recyclerView.getChildAt(j);
-                                    TextView textview = view.findViewById(R.id.contact_name);
-                                    String strname = textview.getText().toString();
+                                contactRef = database.getReference().child("Contacts");
+                                contactRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        Iterator childrenListEmail = dataSnapshot.getChildren().iterator();
+                                        Iterator childrenListUid = dataSnapshot.getChildren().iterator();
 
-                                    contactRef = database.getReference().child("ContactChats").child(strname);
-                                    Map<String,Object> map1 = new HashMap<String, Object>();
-                                    map1.put(""+groupCount,groupNameStr);
-                                    contactRef.updateChildren(map1);
+                                        while (childrenListEmail.hasNext()) {
+                                            String refEmail = ((DataSnapshot) childrenListEmail.next()).child("userEmail").getValue().toString();
+                                            String refUid = ((DataSnapshot) childrenListUid.next()).child("userUid").getValue().toString();
 
-                                    groupContactsRef = database.getReference().child("GroupContacts").child(""+groupCount).child(groupNameStr);
-                                    Map<String,Object> map2 = new HashMap<String, Object>();
-                                    map2.put(strname,"");
-                                    groupContactsRef.updateChildren(map2);
-                                }
+                                            int recycleCount = recyclerView.getChildCount();
+                                            int dynamCOunt = dynamContactList.size();
+                                            for (int j = 0; j < dynamCOunt; j++) {
+                                                String userEmail = dynamContactList.get(j).getUserEmail();
 
-                                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                                intent.putExtra("group_name",groupNameStr);
-                                intent.putExtra("group_count",groupCount);
-                                startActivity(intent);
-                                finish();
+                                                if (userEmail.equals(refEmail)){
+
+                                                    contactChatsRef = database.getReference().child("ContactChats").child(refUid);
+                                                    Map<String, Object> map1 = new HashMap<String, Object>();
+                                                    map1.put("" + groupCount, groupNameStr);
+                                                    contactChatsRef.updateChildren(map1);
+
+                                                    groupContactsRef = database.getReference().child("GroupContacts").child("" + groupCount).child(groupNameStr);
+                                                    Map<String, Object> map2 = new HashMap<String, Object>();
+                                                    map2.put(refUid, userEmail);
+                                                    groupContactsRef.updateChildren(map2);
+
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                        intent.putExtra("group_name", groupNameStr);
+                                        intent.putExtra("group_count", groupCount);
+                                        startActivity(intent);
+
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
                             }
 
                             @Override

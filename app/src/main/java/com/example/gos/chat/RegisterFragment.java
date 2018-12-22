@@ -88,13 +88,13 @@ public class RegisterFragment extends Fragment {
 
                                     contactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts");
                                     Map<String, Object> map1 = new HashMap<String, Object>();
-                                    map1.put(userName, new ContactDetails(userName, user.getEmail().toString(),
-                                                    userName+".jpg"));
+                                    map1.put(user.getUid(), new ContactDetails(userName, user.getEmail(),
+                                                    user.getEmail()+".jpg",user.getUid()));
                                     contactsRef.updateChildren(map1);
 
                                     contactChatRef = FirebaseDatabase.getInstance().getReference().child("ContactChats");
                                     Map<String, Object> map2 = new HashMap<String, Object>();
-                                    map2.put(userName,"");
+                                    map2.put(user.getUid(),user.getEmail());
                                     contactChatRef.updateChildren(map2);
 
                                     Intent intent = new Intent(getActivity(), ChatsGroupsActivity.class);
@@ -105,7 +105,6 @@ public class RegisterFragment extends Fragment {
                                     Toast.makeText(getActivity(), "failed ", Toast.LENGTH_LONG).show();
                             }
                         });
-
             }
         });
 
