@@ -41,7 +41,7 @@ public class ChatsGroupsActivity extends AppCompatActivity {
     private String user_name="";
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseUser user;
-    private DatabaseReference root ;
+    private DatabaseReference contactChatsRef ;
     private FirebaseDatabase database;
     private FloatingActionButton add_group_btn;
     GifTextView Gif;
@@ -57,7 +57,7 @@ public class ChatsGroupsActivity extends AppCompatActivity {
         user = auth.getCurrentUser();
         user_name=user.getDisplayName();
         database = FirebaseDatabase.getInstance();
-        root = database.getReference().child("ContactChats").child(""+user_name);
+        contactChatsRef = database.getReference().child("ContactChats").child(""+user_name);
 
         Gif.setVisibility(View.VISIBLE);
         Handler handler = new Handler();
@@ -80,14 +80,14 @@ public class ChatsGroupsActivity extends AppCompatActivity {
             }
         });
 
-        root.addValueEventListener(new ValueEventListener() {
+        contactChatsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Set<String> set = new HashSet<String>();
                 Iterator i = dataSnapshot.getChildren().iterator();
                 while(i.hasNext())
                 {
-                    set.add(((DataSnapshot)i.next()).getKey());
+                    set.add(((DataSnapshot)i.next()).getValue().toString());
                 }
                 list_of_rooms.clear();
                 list_of_rooms.addAll(set);
