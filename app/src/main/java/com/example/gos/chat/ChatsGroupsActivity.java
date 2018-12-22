@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -103,9 +104,41 @@ public class ChatsGroupsActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                intent.putExtra("group_name",((TextView)view).getText().toString());
-                startActivity(intent);
+                final String groupName = ((TextView)view).getText().toString();
+
+                contactChatsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        Iterator childrenList = dataSnapshot.getChildren().iterator();
+                        while(childrenList.hasNext()){
+                            DatabaseReference keyGroupRef = ((DataSnapshot)childrenList.next()).getRef();
+                            keyGroupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    int groupCount=0;
+                                    if(groupName.equals(dataSnapshot.getValue().toString())){
+                                        groupCount = Integer.parseInt(dataSnapshot.getKey());
+                                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                                        intent.putExtra("group_name",groupName);
+                                        intent.putExtra("group_count",groupCount);
+                                        startActivity(intent);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
     }

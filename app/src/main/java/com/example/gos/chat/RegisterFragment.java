@@ -94,7 +94,7 @@ public class RegisterFragment extends Fragment {
 
                                     contactChatRef = FirebaseDatabase.getInstance().getReference().child("ContactChats");
                                     Map<String, Object> map2 = new HashMap<String, Object>();
-                                    map2.put(userName,user.getUid());
+                                    map2.put(userName,"");
                                     contactChatRef.updateChildren(map2);
 
                                     Intent intent = new Intent(getActivity(), ChatsGroupsActivity.class);

@@ -69,13 +69,11 @@ public class ContactsListActivity extends AppCompatActivity {
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseUser user;
     private ArrayList<ContactDetails> dynamContactList = new ArrayList<>();
-    ListView listView,dynamListView;
-    GridView dynamGridView;
+    ListView listView;
     private int groupCount=0;
     private FloatingActionButton createGroupBtn;
     private ImageView checkedImage;
     private EditText searchText;
-    private UsersAdapter arrayAdapter;
     private RecycleAdapter recycleAdapter;
     private String picLocation="";
     private RecyclerView recyclerView;
@@ -94,15 +92,11 @@ public class ContactsListActivity extends AppCompatActivity {
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(layoutManager);
 
-        //dynamListView=findViewById(R.id.listViewdynam);
         createGroupBtn = findViewById(R.id.crate_group_btn);
         searchText = findViewById(R.id.search_text);
         searchText.setVisibility(View.INVISIBLE);
 
         user = auth.getCurrentUser();
-
-        /*arrayAdapter = new UsersAdapter(this, dynamContactList);
-        dynamListView.setAdapter(arrayAdapter);*/
 
         recycleAdapter = new RecycleAdapter(dynamContactList);
         recyclerView.setAdapter(recycleAdapter);
@@ -213,29 +207,30 @@ public class ContactsListActivity extends AppCompatActivity {
                                 groupCount = (int)dataSnapshot.getChildrenCount();
                                 groupCount++;
 
-                                String text = groupName.getText().toString();
+                                String groupNameStr = groupName.getText().toString();
                                 Map<String,Object> map = new HashMap<String, Object>();
-                                map.put(""+groupCount,text);
+                                map.put(""+groupCount,groupNameStr);
                                 groupRef.updateChildren(map);
 
-                                for(int j =0;j<dynamListView.getChildCount();j++){
-                                    View view = dynamListView.getChildAt(j);
+                                for(int j =0;j<recyclerView.getChildCount();j++){
+                                    View view = recyclerView.getChildAt(j);
                                     TextView textview = view.findViewById(R.id.contact_name);
                                     String strname = textview.getText().toString();
 
                                     contactRef = database.getReference().child("ContactChats").child(strname);
                                     Map<String,Object> map1 = new HashMap<String, Object>();
-                                    map1.put(""+groupCount,text);
+                                    map1.put(""+groupCount,groupNameStr);
                                     contactRef.updateChildren(map1);
 
-                                    groupContactsRef = database.getReference().child("GroupContacts").child(""+groupCount).child(text);
+                                    groupContactsRef = database.getReference().child("GroupContacts").child(""+groupCount).child(groupNameStr);
                                     Map<String,Object> map2 = new HashMap<String, Object>();
                                     map2.put(strname,"");
                                     groupContactsRef.updateChildren(map2);
                                 }
 
                                 Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                                intent.putExtra("group_name",text);
+                                intent.putExtra("group_name",groupNameStr);
+                                intent.putExtra("group_count",groupCount);
                                 startActivity(intent);
                                 finish();
                             }
@@ -326,51 +321,6 @@ public class ContactsListActivity extends AppCompatActivity {
         }
     }
 
-    public class UsersAdapter extends ArrayAdapter<ContactDetails> {
-        public UsersAdapter(Context context, ArrayList<ContactDetails> contacts) {
-            super(context, 0, contacts);
-        }
-
-        @Override
-        public View getView(final int position, View convertView, final ViewGroup parent) {
-            // Get the data item for this position
-            ContactDetails contact = getItem(position);
-            // Check if an existing view is being reused, otherwise inflate the view
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.contact_dynam_layout, parent, false);
-            }
-            // Lookup view for data population
-            TextView contactName = convertView.findViewById(R.id.contact_name);
-            final TextView contactEmail =  convertView.findViewById(R.id.contact_email);
-            final ImageView contactImage = convertView.findViewById(R.id.contact_image);
-            // Populate the data into the template view using the data object
-            contactName.setText(contact.getUserName());
-            contactEmail.setText(contact.getUserEmail());
-
-            loadImageFromStorage(picLocation,contact.getUserName(),contactImage);
-
-            ImageView imageView = convertView.findViewById(R.id.delete_view);
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dynamContactList.remove(position);
-                    arrayAdapter.notifyDataSetChanged();
-                    for(int i =0;i<listView.getChildCount();i++){
-                        View view = listView.getChildAt(i);
-                        TextView textview = view.findViewById(R.id.contact_email);
-                        String strname = textview.getText().toString();
-                        if(strname.equals(contactEmail.getText().toString())){
-                            checkedImage = view.findViewById(R.id.checked_image);
-                            checkedImage.setVisibility(View.INVISIBLE);
-                            break;
-                        }
-                    }
-                }
-            });
-            // Return the completed view to render on screen
-            return convertView;
-        }
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.contacts_menu,menu);

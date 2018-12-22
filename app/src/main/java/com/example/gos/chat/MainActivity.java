@@ -52,9 +52,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     private ToggleButton toggleButton;
     private FirebaseListAdapter<ChatMessage> adapter;
     private static final int REQUEST_RECORD_PERMISSION = 100;
-    private String groupKey, groupName, currUserName;
+    private String groupName, currUserName;
     TextView viewRecord, txtMsg,dateView;
-    private int viewPartMsgLimitChars = 50;
+    private int viewPartMsgLimitChars = 50,groupCount;
     private int countParticalMsgToView = 0;
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseUser user;
@@ -71,11 +71,12 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         user = auth.getCurrentUser();
         groupName = getIntent().getExtras().get("group_name").toString();
+        groupCount = getIntent().getIntExtra("group_count",0);
         currUserName = user.getDisplayName();
 
         database = FirebaseDatabase.getInstance();
-        groupContactsRef = database.getReference().child("GroupContacts").child(groupName);
-        dbRef = database.getReference().child("Groups").child(groupName);
+        groupContactsRef = database.getReference().child("GroupContacts").child(""+groupCount).child(groupName);
+        dbRef = database.getReference().child("Groups").child(""+groupCount).child(groupName);
         setTitle(""+groupName);
 
         groupContactsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -135,18 +136,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return true;
     }
- /*   private Bitmap loadImageFromStorage(String path,String name)
-    {
-        try {
-            File f=new File(path, name+".jpg");
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            return b;
-        }
-        catch (FileNotFoundException e)
-        {
 
-        }
-    }*/
     public void pushAndDestroy(){
         if(!viewRecord.getText().equals("")) {
             dbRef.push().setValue(new ChatMessage("" + viewRecord.getText().toString(),
