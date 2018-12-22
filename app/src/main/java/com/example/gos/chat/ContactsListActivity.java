@@ -14,8 +14,11 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,9 +40,13 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -63,12 +71,14 @@ public class ContactsListActivity extends AppCompatActivity {
     private ArrayList<ContactDetails> dynamContactList = new ArrayList<>();
     ListView listView,dynamListView;
     GridView dynamGridView;
-    private int groupKey=0;
+    private int groupCount=0;
     private FloatingActionButton createGroupBtn;
     private ImageView checkedImage;
     private EditText searchText;
     private UsersAdapter arrayAdapter;
+    private RecycleAdapter recycleAdapter;
     private String picLocation="";
+    private RecyclerView recyclerView;
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReference();
     StorageReference imagesRef ;
@@ -79,15 +89,23 @@ public class ContactsListActivity extends AppCompatActivity {
         setContentView(R.layout.contacts_list);
 
         listView=findViewById(R.id.listView);
-        dynamListView=findViewById(R.id.listViewdynam);
+        recyclerView = findViewById(R.id.listViewdynam);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        recyclerView.setLayoutManager(layoutManager);
+
+        //dynamListView=findViewById(R.id.listViewdynam);
         createGroupBtn = findViewById(R.id.crate_group_btn);
         searchText = findViewById(R.id.search_text);
         searchText.setVisibility(View.INVISIBLE);
 
         user = auth.getCurrentUser();
 
-        arrayAdapter = new UsersAdapter(this, dynamContactList);
-        dynamListView.setAdapter(arrayAdapter);
+        /*arrayAdapter = new UsersAdapter(this, dynamContactList);
+        dynamListView.setAdapter(arrayAdapter);*/
+
+        recycleAdapter = new RecycleAdapter(dynamContactList);
+        recyclerView.setAdapter(recycleAdapter);
 
         database = FirebaseDatabase.getInstance();
 
@@ -142,8 +160,8 @@ public class ContactsListActivity extends AppCompatActivity {
 
                 String stremail = email.getText().toString();
 
-                for(int j =0;j<dynamListView.getChildCount();j++) {
-                    View tempView = dynamListView.getChildAt(j);
+                for(int j =0;j<recyclerView.getChildCount();j++) {
+                    View tempView = recyclerView.getChildAt(j);
                     TextView textview = tempView.findViewById(R.id.contact_email);
                     String tmpname = textview.getText().toString();
                     if(!tmpname.equals(stremail))
@@ -157,7 +175,7 @@ public class ContactsListActivity extends AppCompatActivity {
                 }
                 if (existFlag) {
                     dynamContactList.add(new ContactDetails(strname, stremail,image));
-                    arrayAdapter.notifyDataSetChanged();
+                    recycleAdapter.notifyDataSetChanged();
                 }
 
                 if(checkedImage.getVisibility() == View.INVISIBLE) {
@@ -165,13 +183,13 @@ public class ContactsListActivity extends AppCompatActivity {
                 }
                 else {
                     checkedImage.setVisibility(View.INVISIBLE);
-                    for(int i =0;i<dynamListView.getChildCount();i++){
-                        View dynamview = dynamListView.getChildAt(i);
+                    for(int i =0;i<recyclerView.getChildCount();i++){
+                        View dynamview = recyclerView.getChildAt(i);
                         TextView textview = dynamview.findViewById(R.id.contact_email);
                         String dynammail = textview.getText().toString();
                         if(stremail.equals(dynammail)){
                             dynamContactList.remove(i);
-                            arrayAdapter.notifyDataSetChanged();
+                            recycleAdapter.notifyDataSetChanged();
                         }
                     }
                 }
@@ -188,34 +206,45 @@ public class ContactsListActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         groupRef = database.getReference().child("Groups");
-                        final String text = groupName.getText().toString();
-                        Map<String,Object> map = new HashMap<String, Object>();
-                        map.put(text,""+groupKey);
-                        groupKey++;
-                        groupRef.updateChildren(map);
 
-                        for(int j =0;j<dynamListView.getChildCount();j++){
-                            View view = dynamListView.getChildAt(j);
-                            TextView textview = view.findViewById(R.id.contact_name);
-                            String strname = textview.getText().toString();
+                        groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                groupCount = (int)dataSnapshot.getChildrenCount();
+                                groupCount++;
 
-                            contactRef = database.getReference().child("ContactChats").child(strname);
-                            Map<String,Object> map1 = new HashMap<String, Object>();
-                            map1.put(text,""+groupKey);
-                            groupKey++;
-                            contactRef.updateChildren(map1);
+                                String text = groupName.getText().toString();
+                                Map<String,Object> map = new HashMap<String, Object>();
+                                map.put(""+groupCount,text);
+                                groupRef.updateChildren(map);
 
-                            groupContactsRef = database.getReference().child("GroupContacts").child(text);
-                            Map<String,Object> map2 = new HashMap<String, Object>();
-                            map2.put(strname,""+groupKey);
-                            groupKey++;
-                            groupContactsRef.updateChildren(map2);
-                        }
+                                for(int j =0;j<dynamListView.getChildCount();j++){
+                                    View view = dynamListView.getChildAt(j);
+                                    TextView textview = view.findViewById(R.id.contact_name);
+                                    String strname = textview.getText().toString();
 
-                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                        intent.putExtra("group_name",text);
-                        startActivity(intent);
-                        finish();
+                                    contactRef = database.getReference().child("ContactChats").child(strname);
+                                    Map<String,Object> map1 = new HashMap<String, Object>();
+                                    map1.put(""+groupCount,text);
+                                    contactRef.updateChildren(map1);
+
+                                    groupContactsRef = database.getReference().child("GroupContacts").child(""+groupCount).child(text);
+                                    Map<String,Object> map2 = new HashMap<String, Object>();
+                                    map2.put(strname,"");
+                                    groupContactsRef.updateChildren(map2);
+                                }
+
+                                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                                intent.putExtra("group_name",text);
+                                startActivity(intent);
+                                finish();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
 
                     }
                 }).create().show();
@@ -376,5 +405,67 @@ public class ContactsListActivity extends AppCompatActivity {
             break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.MyViewHolder> {
+
+        private ArrayList<ContactDetails> contactList;
+
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public TextView name, email;
+            public ImageView delete,image;
+
+            public MyViewHolder(final View view) {
+                super(view);
+                name = (TextView) view.findViewById(R.id.contact_name);
+                email = (TextView) view.findViewById(R.id.contact_email);
+                image = (ImageView) view.findViewById(R.id.contact_image);
+                delete = (ImageView) view.findViewById(R.id.delete_view);
+
+                loadImageFromStorage(picLocation, name.getText().toString(), image);
+            }
+        }
+
+        public RecycleAdapter(ArrayList<ContactDetails> contactList) {
+            this.contactList = contactList;
+        }
+
+        @Override
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.contact_dynam_layout, parent, false);
+
+            return new MyViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(MyViewHolder holder, final int position) {
+            final ContactDetails contact = contactList.get(position);
+            holder.name.setText(contact.getUserName());
+            holder.email.setText(contact.getUserEmail());
+
+            holder.delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dynamContactList.remove(position);
+                    recycleAdapter.notifyDataSetChanged();
+                    for(int i =0;i<listView.getChildCount();i++){
+                        View view = listView.getChildAt(i);
+                        TextView textview = view.findViewById(R.id.contact_email);
+                        String strname = textview.getText().toString();
+                        if(strname.equals(contact.getUserEmail())){
+                            checkedImage = view.findViewById(R.id.checked_image);
+                            checkedImage.setVisibility(View.INVISIBLE);
+                            break;
+                        }
+                    }
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return contactList.size();
+        }
     }
 }

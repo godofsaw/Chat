@@ -32,7 +32,7 @@ public class RegisterFragment extends Fragment {
     FirebaseUser user;
     EditText userEmailEt, passwordEt,usernameET;
     FloatingActionButton registerBtn;
-    private DatabaseReference contactsRef,contactChatRef;
+    private DatabaseReference contactsRef,contactChatRef,usersRef;
     TextView appName;
     ImageButton backBtn;
 
